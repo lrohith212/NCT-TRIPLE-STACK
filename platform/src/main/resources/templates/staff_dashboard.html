@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty Dashboard | NoDue+</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #6366f1; --bg: #f1f5f9; --text: #334155; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; color: var(--text); }
+        .sidebar { width: 260px; background: #1e293b; color: white; padding: 25px; display: flex; flex-direction: column; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .dept-badge { background: white; padding: 8px 15px; border-radius: 30px; font-weight: 600; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .control-panel { background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; gap: 20px;}
+        .control-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+
+        .table-card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px 25px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #64748b; font-weight: 500; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #fffbeb; color: #b45309; }
+        .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-check { background: #ecfdf5; color: #059669; }
+        .btn-cross { background: #fef2f2; color: #dc2626; }
+        .menu-item { color: #94a3b8; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 10px; display: block;}
+        .menu-item:hover { color: white; background: rgba(255,255,255,0.1); }
+        
+        /* SEARCH BAR STYLE */
+        .search-container { position: relative; width: 300px; }
+        .search-container input { width: 100%; padding-left: 35px; }
+        .search-container i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div style="font-size:1.4rem; font-weight:700; color:white; margin-bottom:40px;">Staff Portal</div>
+        <a href="#" class="menu-item">Dashboard</a>
+        <a href="/logout" class="menu-item" style="margin-top:auto; color:#f87171;">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h2 style="margin:0;">Welcome, <span th:text="${user.name}">Prof</span></h2>
+            <div class="dept-badge"><i class="fas fa-university"></i> <span th:text="${user.department}">Dept</span></div>
+        </div>
+
+        <div class="control-panel">
+            <div style="flex: 1;">
+                <div class="control-title">Set Requirements</div>
+                <form action="/set-requirements" method="POST" style="display: flex; gap: 10px;">
+                    <select name="semester">
+                        <option value="4">Sem 4</option><option value="5">Sem 5</option>
+                        <option value="6">Sem 6</option><option value="7">Sem 7</option>
+                    </select>
+                    <input type="text" name="activities" placeholder="e.g. Workshop" required style="flex:1;">
+                    <button type="submit" class="btn-primary">Update</button>
+                </form>
+            </div>
+            <div style="border-left: 1px solid #e2e8f0; padding-left: 20px;">
+                <div class="control-title">Export</div>
+                <a href="/download-report"><button class="btn-primary" style="background:#10b981; width:100%;">Download CSV</button></a>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div>
+                <div class="control-title">Post Upcoming Event</div>
+                <div style="font-size:0.9rem; color:#64748b;">Announce hackathons or workshops.</div>
+            </div>
+            <form action="/post-event" method="POST" enctype="multipart/form-data" 
+                  style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1; justify-content: flex-end;">
+                <input type="text" name="title" placeholder="Event Title" required style="width: 45%;">
+                <input type="text" name="link" placeholder="Link (Optional)" style="width: 45%;">
+                <div style="display:flex; gap:10px; width:100%;">
+                    <input type="date" name="eventDate" required style="width:50%">
+                    <input type="date" name="deadline" required style="width:50%" title="Deadline">
+                </div>
+                <input type="text" name="description" placeholder="Description" required style="width: 100%;">
+                <div style="width:100%; display:flex; align-items:center; gap:10px;">
+                    <label style="font-size:0.8rem; font-weight:600; color:#334155;">Poster:</label>
+                    <input type="file" name="poster" accept="image/*" required style="border:none;">
+                </div>
+                <button type="submit" class="btn-primary" style="background: #8b5cf6; width:100%;">Post Announcement</button>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <div style="padding:20px 25px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-weight:600;">Pending Submissions</div>
+                
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search Name or ID...">
+                </div>
+            </div>
+
+            <table id="submissionsTable">
+                <thead>
+                    <tr><th>Student</th><th>Activity</th><th>Proof</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    <th:block th:each="student : ${students}">
+                        <th:block th:unless="${#lists.isEmpty(student.myActivities)}">
+                            <tr th:each="act : ${student.myActivities}" th:if="${act.status == 'PENDING'}">
+                                <td>
+                                    <strong th:text="${student.name}">Name</strong><br>
+                                    <small th:text="${student.id}">ID</small>
+                                </td>
+                                <td>
+                                    <div th:text="${act.type}" style="font-weight:500;">Type</div>
+                                    <small th:text="${act.eventName}">Event</small>
+                                </td>
+                                <td>
+                                    <a th:if="${act.certificateImage != null}" 
+                                       th:href="'data:image/png;base64,' + ${act.certificateImage}" 
+                                       target="_blank" style="color:var(--primary);">View</a>
+                                </td>
+                                <td><span class="status-badge">PENDING</span></td>
+                                <td>
+                                    <div style="display:flex; gap:8px;">
+                                        <form action="/update-status" method="POST">
+                                            <input type="hidden" name="studentId" th:value="${student.id}">
+                                            <input type="hidden" name="activityType" th:value="${act.type}">
+                                            <input type="hidden" name="status" value="APPROVED">
+                                            <button type="submit" class="btn-icon btn-check"><i class="fas fa-check"></i></button>
+                                        </form>
+                                        <button type="button" class="btn-icon btn-cross" 
+                                                th:data-id="${student.id}" th:data-type="${act.type}" 
+                                                onclick="openRejectModal(this)"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </th:block>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <form id="rejectForm" action="/update-status" method="POST" style="display:none;">
+        <input type="hidden" name="studentId" id="rejectStudentId">
+        <input type="hidden" name="activityType" id="rejectType">
+        <input type="hidden" name="status" value="REJECTED">
+        <input type="hidden" name="reason" id="rejectReason">
+    </form>
+    
+    <script>
+        function openRejectModal(btn) {
+            var sId = btn.getAttribute('data-id');
+            var type = btn.getAttribute('data-type');
+            let reason = prompt("Reason for rejection:");
+            if (reason) {
+                document.getElementById('rejectStudentId').value = sId;
+                document.getElementById('rejectType').value = type;
+                document.getElementById('rejectReason').value = reason;
+                document.getElementById('rejectForm').submit();
+            }
+        }
+
+        // NEW FILTER FUNCTION
+        function filterTable() {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById("submissionsTable");
+            var tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (var i = 1; i < tr.length; i++) {
+                var tdName = tr[i].getElementsByTagName("td")[0]; // Column 0: Student Name/ID
+                if (tdName) {
+                    var txtValue = tdName.textContent || tdName.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

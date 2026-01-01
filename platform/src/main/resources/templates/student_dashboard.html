@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Portal | NoDue+</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #6366f1; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; color: var(--text); }
+        .sidebar { width: 260px; background: white; padding: 30px; display: flex; flex-direction: column; border-right: 1px solid #e2e8f0; }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        
+        .req-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        
+        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; }
+        .btn-upload { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; }
+
+        .status-box { padding: 15px; border-radius: 12px; margin-top: auto; }
+        .st-pending { background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; }
+        .st-approved { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; }
+        .st-rejected { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+        
+        /* Sidebar Links */
+        .nav-link { 
+            color: #64748b; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 10px 0;
+            font-weight: 500; 
+            transition: 0.3s;
+        }
+        .nav-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:40px;">NoDue+</div>
+        
+        <div style="margin-bottom: 30px;">
+            <div style="font-weight:600;" th:text="${user.name}">Name</div>
+            <div style="font-size:0.9rem; color:#64748b;" th:text="${user.department}">Dept</div>
+        </div>
+
+        <a href="/profile" class="nav-link">
+            <i class="fas fa-user-cog"></i> Edit Profile
+        </a>
+
+        <a href="/logout" class="nav-link" style="margin-top:auto; color:#ef4444;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+
+    <div class="main-content">
+        <h1>Semester Clearance</h1>
+
+        <h3 style="color:#334155;">📢 Upcoming Opportunities</h3>
+        
+        <div style="display: flex; gap: 25px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 30px;">
+            <div th:if="${events.empty}" style="color:#94a3b8; font-style:italic;">No upcoming events.</div>
+
+            <div th:each="evt : ${events}" 
+                 style="min-width: 320px; max-width: 320px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column;">
+                
+                <div style="height: 160px; overflow: hidden; background: #f1f5f9; position: relative;">
+                    <img th:if="${evt.posterImage != null}" 
+                         th:src="'data:image/png;base64,' + ${evt.posterImage}" 
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                    <div th:if="${evt.posterImage == null}" 
+                         style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
+                        <i class="fas fa-image" style="font-size: 3rem;"></i>
+                    </div>
+                    <div style="position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                        Deadline: <span th:text="${evt.deadline}">Date</span>
+                    </div>
+                </div>
+
+                <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #8b5cf6; margin-bottom: 5px;">
+                        Date: <span th:text="${evt.eventDate}"></span>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #1e293b;" th:text="${evt.title}">Title</h3>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px; flex: 1;" th:text="${evt.description}">Desc</p>
+                    <a th:href="${evt.link}" target="_blank" 
+                       style="text-align: center; text-decoration: none; background: #1e293b; color: white; padding: 12px; border-radius: 8px; font-weight: 600;">
+                       Register Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="color:#334155;">📝 Requirements</h3>
+        <div class="grid">
+            <div th:each="reqName : ${requirements}" class="req-card">
+                <div style="font-weight:600; font-size:1.1rem; margin-bottom:15px;" th:text="${reqName}">Hackathon</div>
+
+                <th:block th:with="foundActivity=${user.myActivities.?[type == #root.reqName]}">
+                    
+                    <div th:if="${foundActivity.empty}">
+                        <form action="/upload-activity" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="activityType" th:value="${reqName}">
+                            <input type="text" name="eventName" placeholder="Event Name" required>
+                            <input type="text" name="place" placeholder="Place" required>
+                            <input type="date" name="date" required>
+                            <input type="text" name="college" placeholder="College" required>
+                            <input type="file" name="certificate" required>
+                            <button type="submit" class="btn-upload">Submit Proof</button>
+                        </form>
+                    </div>
+
+                    <div th:unless="${foundActivity.empty}" th:with="myAct=${foundActivity[0]}">
+                        
+                        <div th:if="${myAct.status == 'PENDING'}" class="status-box st-pending">Under Review</div>
+                        
+                        <div th:if="${myAct.status == 'APPROVED'}" class="status-box st-approved">Approved</div>
+                        
+                        <div th:if="${myAct.status == 'REJECTED'}">
+                            <div class="status-box st-rejected" style="margin-bottom: 15px;">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                <strong>Rejected:</strong> <span th:text="${myAct.rejectionReason}"></span>
+                            </div>
+
+                            <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px;">
+                                <div style="font-size:0.85rem; color:#64748b; margin-bottom:10px; font-weight:600;">Re-submit Corrected Proof:</div>
+                                <form action="/upload-activity" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="activityType" th:value="${reqName}">
+                                    
+                                    <input type="text" name="eventName" placeholder="Event Name" th:value="${myAct.eventName}" required>
+                                    <input type="text" name="place" placeholder="Place" th:value="${myAct.place}" required>
+                                    <input type="date" name="date" th:value="${myAct.date}" required>
+                                    <input type="text" name="college" placeholder="College" th:value="${myAct.college}" required>
+                                    
+                                    <input type="file" name="certificate" required>
+                                    <button type="submit" class="btn-upload">Re-Submit</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

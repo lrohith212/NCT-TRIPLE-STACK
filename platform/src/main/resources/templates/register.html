@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoDue+ | Next Gen Clearance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background: #0f172a;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Bubbles */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0.4;
+            filter: blur(80px);
+            animation: float 10s infinite alternate;
+            z-index: 1;
+        }
+        .b1 { width: 400px; height: 400px; top: -100px; left: -100px; }
+        .b2 { width: 300px; height: 300px; bottom: -50px; right: -50px; animation-duration: 15s; background: #ec4899; }
+        .b3 { width: 200px; height: 200px; top: 40%; left: 40%; animation-duration: 12s; opacity: 0.2; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 50px); }
+        }
+
+        /* Glass Card */
+        .container {
+            position: relative;
+            z-index: 10;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 900px;
+            max-width: 90%;
+            min-height: 600px;
+            display: flex;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Left Side (Visual) */
+        .left-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border-right: 1px solid var(--border);
+            color: white;
+        }
+        
+        .logo { font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary); }
+
+        .hero-text h1 { font-size: 3rem; line-height: 1.1; margin-bottom: 15px; background: linear-gradient(to right, #fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-text p { color: #94a3b8; font-size: 1.1rem; max-width: 90%; }
+        
+        /* Right Side (Form) */
+        .right-panel {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 { color: white; font-size: 2rem; margin-bottom: 30px; }
+
+        /* Inputs */
+        .input-group { position: relative; margin-bottom: 20px; transition: 0.3s; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #64748b; transition: 0.3s; }
+        
+        input, select {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+        input:focus + i { color: var(--primary); }
+
+        /* Role Switcher */
+        .role-switch {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #334155;
+        }
+        .role-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            color: #94a3b8;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .role-btn.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .switch-text { text-align: center; color: #64748b; margin-top: 20px; font-size: 0.9rem; }
+        .switch-text span { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: underline; }
+
+        .hidden { display: none; }
+        .error-msg { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { flex-direction: column; width: 95%; }
+            .left-panel { padding: 30px; min-height: 200px; }
+            .hero-text h1 { font-size: 2rem; }
+            .right-panel { padding: 30px; }
+        }
+    </style>
+
+    <script>
+        // --- KEEPING THE SAME LOGIC AS BEFORE ---
+        function setRole(role) {
+            document.getElementById('studentBtn').classList.toggle('active', role === 'STUDENT');
+            document.getElementById('staffBtn').classList.toggle('active', role === 'STAFF');
+            document.getElementById("roleInput").value = role;
+
+            var isLogin = document.getElementById("mainForm").getAttribute("action") === "/login";
+            var studentFields = document.getElementById("studentFields");
+            var staffFields = document.getElementById("staffFields");
+            var yearSelect = document.getElementsByName("year")[0];
+            var deptSelect = document.getElementsByName("department")[0];
+
+            if (role === 'STAFF') {
+                document.getElementById("idInput").placeholder = "Employee ID";
+                if (!isLogin) staffFields.classList.remove("hidden");
+                studentFields.classList.add("hidden");
+                yearSelect.removeAttribute("required");
+                deptSelect.removeAttribute("required");
+            } else {
+                document.getElementById("idInput").placeholder = "Roll Number";
+                staffFields.classList.add("hidden");
+                if (!isLogin) {
+                    studentFields.classList.remove("hidden");
+                    yearSelect.setAttribute("required", "");
+                    deptSelect.setAttribute("required", "");
+                }
+            }
+        }
+
+        function switchMode(mode) {
+            const form = document.getElementById("mainForm");
+            const title = document.getElementById("formTitle");
+            const submitBtn = document.getElementById("submitBtn");
+            const toggleText = document.getElementById("toggleText");
+            const nameGroup = document.getElementById("nameGroup");
+            const studentFields = document.getElementById("studentFields");
+            const staffFields = document.getElementById("staffFields");
+            const role = document.getElementById("roleInput").value;
+            
+            var yearSelect = document.getElementsByName("year")[0];
+            var deptSelect = document.getElementsByName("department")[0];
+
+            if (mode === 'LOGIN') {
+                form.action = "/login";
+                title.innerText = "Welcome Back";
+                submitBtn.innerText = "Log In";
+                nameGroup.classList.add("hidden");
+                studentFields.classList.add("hidden");
+                staffFields.classList.add("hidden");
+                yearSelect.removeAttribute("required");
+                deptSelect.removeAttribute("required");
+                toggleText.innerHTML = "Don't have an account? <span onclick=\"switchMode('REGISTER')\">Sign Up</span>";
+            } else {
+                form.action = "/register";
+                title.innerText = "Create Account";
+                submitBtn.innerText = "Get Started";
+                nameGroup.classList.remove("hidden");
+                if (role === 'STUDENT') {
+                    studentFields.classList.remove("hidden");
+                    yearSelect.setAttribute("required", "");
+                    deptSelect.setAttribute("required", "");
+                } else {
+                    staffFields.classList.remove("hidden");
+                }
+                toggleText.innerHTML = "Already have an account? <span onclick=\"switchMode('LOGIN')\">Log In</span>";
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo">
+                <i class="fas fa-check-double"></i> NoDue+
+            </div>
+            <div class="hero-text">
+                <h1>Smart Clearance<br>System.</h1>
+                <p>Seamlessly manage approvals, hackathons, and no-due certificates with one click.</p>
+            </div>
+            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">© 2025 TechSprint </div>
+        </div>
+
+        <div class="right-panel">
+            <h2 id="formTitle">Create Account</h2>
+
+            <div th:if="${error}" class="error-msg">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
+            <form id="mainForm" action="/register" method="POST">
+                <input type="hidden" id="roleInput" name="role" value="STUDENT">
+
+                <div class="role-switch">
+                    <div id="studentBtn" class="role-btn active" onclick="setRole('STUDENT')">Student</div>
+                    <div id="staffBtn" class="role-btn" onclick="setRole('STAFF')">Faculty</div>
+                </div>
+
+                <div class="input-group" id="nameGroup">
+                    <input type="text" name="name" placeholder="Full Name">
+                    <i class="fas fa-user"></i>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="idInput" name="id" placeholder="Roll Number" required>
+                    <i class="fas fa-id-card"></i>
+                </div>
+
+                <div id="studentFields">
+                    <div class="input-group">
+                        <select name="department" required>
+                            <option value="" disabled selected>Department</option>
+                            <option value="CSE">CSE</option>
+                            <option value="ECE">ECE</option>
+                            <option value="AI&DS">AI & DS</option>
+                            <option value="IT">IT</option>
+                            <option value="MECH">EEE</option>
+                        </select>
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="input-group">
+                        <select name="year" required>
+                            <option value="" disabled selected>Current Semester</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                </div>
+
+                <div id="staffFields" class="hidden">
+                    <div class="input-group">
+                        <input type="password" name="adminCode" placeholder="Admin Secret Key">
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">Get Started</button>
+            </form>
+
+            <p class="switch-text" id="toggleText">
+                Already have an account? <span onclick="switchMode('LOGIN')">Log In</span>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
